@@ -30,3 +30,15 @@ def draw_rectangles(img, rectangle_list):
     # Draw all rectangles stored in the list onto the frame
     for top_right, bottom_left in rectangle_list:
         cv2.rectangle(img, top_right, bottom_left, (0, 255, 0), -1)
+
+
+def move_rectangle(x, y, rectangle_list):
+    top_right, bottom_left = rectangle_list[-1]
+
+    rectangle_width = bottom_left[0] - top_right[0]
+    rectangle_height = bottom_left[1] - top_right[1]
+
+    new_top_right = (int(x - rectangle_width / 2), int(y - rectangle_height / 2))
+    new_bottom_left = (new_top_right[0] + rectangle_width, new_top_right[1] + rectangle_height)
+
+    rectangle_list[-1] = (new_top_right, new_bottom_left)
