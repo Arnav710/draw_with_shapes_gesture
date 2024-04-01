@@ -103,7 +103,7 @@ def move_rectangle(x, y):
     rectangle_width = bottom_left[0] - top_right[0]
     rectangle_height = bottom_left[1] - top_right[1]
 
-    new_top_right = (x - rectangle_width / 2, y - rectangle_height / 2)
+    new_top_right = (int(x - rectangle_width / 2), int(y - rectangle_height / 2))
     new_bottom_left = (new_top_right[0] + rectangle_width, new_top_right[1] + rectangle_height)
 
     rectangle_list[-1] = (new_top_right, new_bottom_left)
@@ -127,8 +127,21 @@ with mphands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) as
 
         # Draw landmarks on the frame
         if processFrames.multi_hand_landmarks:
+            index_finger_landmark = None
             for lm in processFrames.multi_hand_landmarks:
                 mpdrawing.draw_landmarks(frame, lm, mphands.HAND_CONNECTIONS)
+                index_finger_landmark = lm.landmark[8]
+                print(index_finger_landmark)
+                # Index finger position in pixel coordinates
+                index_finger_x = int(index_finger_landmark.x * winwidth)
+                index_finger_y = int(index_finger_landmark.y * winheight)
+
+                # If the index finger lies inside the last rectangle placed, we can move it through gestures
+                if len(rectangle_list) > 0:
+                    rec = rectangle_list[-1]
+                    if index_finger_inside_rectangle(rec, index_finger_x, index_finger_y):
+                        # Move the most recently added rectangle
+                        move_rectangle(index_finger_x, index_finger_y)
 
         # Resize the frame to the desired window size
         resized_frame = cv2.resize(frame, (winwidth, winheight))
@@ -141,18 +154,6 @@ with mphands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) as
             print("Clicked")
             add_rectangle()
             button_clicked = False  # Reset the button clicked flag
-
-        # Index finger position in pixel coordinates
-        index_finger_landmark = lm.landmarks[8]        
-        index_finger_x = int(index_finger_landmark.x * winwidth)
-        index_finger_y = int(index_finger_landmark.y * winheight)
-
-        # If the index finger lies inside the last rectangle placed, we can move it through gestures
-        if len(rectangle_list) > 0:
-            rec = rectangle_list[-1]
-            if index_finger_inside_rectangle(rec, index_finger_x, index_finger_y):
-                # Move the most recently added rectangle
-                move_rectangle(index_finger_x, index_finger_y)
 
 
         # Draw all rectangles onto the frame
