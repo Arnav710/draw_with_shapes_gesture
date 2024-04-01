@@ -2,22 +2,24 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
+import constants
+
 # Initialize mediapipe hands module
 mphands = mp.solutions.hands
 mpdrawing = mp.solutions.drawing_utils
 
 # Initialize video capture
-vidcap = cv2.VideoCapture(0)
+vidcap = cv2.VideoCapture(constants.WEBCAM_SRC)
 
 # Set the desired window width and height
-winwidth = 1280
-winheight = 720
+winwidth = constants.WINDOW_WIDTH
+winheight = constants.WINDOW_HEIGHT
 
 # Button dimensions
-button_x = 20
-button_y = 20
-button_width = 200
-button_height = 50
+button_x = constants.BUTTON_TOP_RIGHT_X
+button_y = constants.BUTTON_TOP_RIGHT_Y
+button_width = constants.BUTTON_WIDTH
+button_height = constants.BUTTON_HEIGHT
 
 # Flag to indicate if the button was clicked
 button_clicked = False
