@@ -119,6 +119,9 @@ with mphands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) as
         if not ret:
             break
 
+        # flip the frame along the y axis
+        frame = cv2.flip(frame,1)
+
         # Convert the BGR image to RGB
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
