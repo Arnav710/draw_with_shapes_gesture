@@ -87,6 +87,27 @@ def on_mouse(event, x, y, flags, param):
             if not button_clicked:
                 button_clicked = True
 
+def index_finger_inside_rectangle(rec, x, y):
+    top_right, bottom_left = rec
+
+    x_in_bounds = top_right[0] <= x and x <= bottom_left[0]
+    y_in_bounds = top_right[1] <= y and bottom_left[1]
+
+    return x_in_bounds and y_in_bounds
+
+def move_rectangle(x, y):
+    global rectangle_list
+
+    top_right, bottom_left = rectangle_list[-1]
+
+    rectangle_width = bottom_left[0] - top_right[0]
+    rectangle_height = bottom_left[1] - top_right[1]
+
+    new_top_right = (x - rectangle_width / 2, y - rectangle_height / 2)
+    new_bottom_left = (new_top_right[0] + rectangle_width, new_top_right[1] + rectangle_height)
+
+    rectangle_list[-1] = (new_top_right, new_bottom_left)
+
 # Set up the mouse callback
 cv2.namedWindow('Hand Tracking')
 cv2.setMouseCallback('Hand Tracking', on_mouse)
@@ -120,6 +141,19 @@ with mphands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) as
             print("Clicked")
             add_rectangle()
             button_clicked = False  # Reset the button clicked flag
+
+        # Index finger position in pixel coordinates
+        index_finger_landmark = lm.landmarks[8]        
+        index_finger_x = int(index_finger_landmark.x * winwidth)
+        index_finger_y = int(index_finger_landmark.y * winheight)
+
+        # If the index finger lies inside the last rectangle placed, we can move it through gestures
+        if len(rectangle_list) > 0:
+            rec = rectangle_list[-1]
+            if index_finger_inside_rectangle(rec, index_finger_x, index_finger_y):
+                # Move the most recently added rectangle
+                move_rectangle(index_finger_x, index_finger_y)
+
 
         # Draw all rectangles onto the frame
         draw_rectangles(resized_frame)
