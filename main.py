@@ -99,14 +99,13 @@ with mphands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5) as
                         and finger_inside_rectangle(rec, middle_finger_x, middle_finger_y):
                         if start_time == None:
                             start_time = time.time()
-                        elif time.time() - start_time >= 2:
-                            print("move rectangle enabled")
-                            move_rectangle_enabled = True
+                        elif time.time() - start_time >= 3:                  
+                            move_rectangle_enabled = not move_rectangle_enabled
+                            start_time = time.time()
+                            print("move rectangle", move_rectangle_enabled)
                         
                     else:
-                        print("move rectangle disabled")
                         start_time = None
-                        move_rectangle_enabled = False
                     
 
                     if move_rectangle_enabled:
